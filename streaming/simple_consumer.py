@@ -2,11 +2,11 @@ import json
 import joblib
 import pandas as pd
 from kafka import KafkaConsumer
-import csv
 import os
+import time
 
 # Load model
-model = joblib.load("model/fraud_model.pkl")
+model = joblib.load("model/random_forest_model.joblib")
 
 # Feature order (VERY IMPORTANT)
 FEATURES = ['Time','V1','V2','V3','V4','V5','V6','V7','V8','V9',
@@ -14,23 +14,35 @@ FEATURES = ['Time','V1','V2','V3','V4','V5','V6','V7','V8','V9',
             'V19','V20','V21','V22','V23','V24','V25','V26','V27',
             'V28','Amount']
 
+QUEUE_FILE = "streaming/transactions_queue.jsonl"
+
 # Create results file
 if not os.path.exists("results.csv"):
     with open("results.csv", "w") as f:
         pass
 
-# Kafka consumer
-consumer = KafkaConsumer(
-    "transactions",
-    bootstrap_servers="localhost:9092",
-    value_deserializer=lambda x: json.loads(x.decode("utf-8"))
-)
+# Kafka consumer (with local file fallback)
+consumer = None
 
-print("🚀 Consumer started...")
+try:
+    consumer = KafkaConsumer(
+        "transactions",
+        bootstrap_servers="localhost:9092",
+        value_deserializer=lambda x: json.loads(x.decode("utf-8"))
+    )
+except Exception:
+    consumer = None
 
-for msg in consumer:
+if consumer:
+    print("Consumer started in Kafka mode...")
+else:
+    print("Consumer started in file-queue mode...")
+
+
+def handle_transaction(transaction):
     try:
-        transaction = msg.value
+        if transaction is None:
+            return
 
         # Remove label
         if "Class" in transaction:
@@ -56,3 +68,22 @@ for msg in consumer:
 
     except Exception as e:
         print("Consumer Error:", e)
+
+
+if consumer:
+    for msg in consumer:
+        handle_transaction(msg.value)
+else:
+    open(QUEUE_FILE, "a", encoding="utf-8").close()
+    offset = 0
+
+    while True:
+        with open(QUEUE_FILE, "r", encoding="utf-8") as f:
+            f.seek(offset)
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                handle_transaction(json.loads(line))
+            offset = f.tell()
+        time.sleep(0.2)

@@ -4,9 +4,6 @@ import pandas as pd
 st.set_page_config(layout="wide")
 st.title("🚨 Real-Time Fraud Detection")
 
-# auto refresh
-st.experimental_rerun()
-
 try:
     df = pd.read_csv("results.csv", names=["prob", "status"])
 
