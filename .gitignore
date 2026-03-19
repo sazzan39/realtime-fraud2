@@ -1,0 +1,13 @@
+
+
+# Ignore dataset files
+datasets/
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
+venv/

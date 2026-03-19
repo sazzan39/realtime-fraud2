@@ -8,7 +8,7 @@ import time
 # Load model
 model = joblib.load("model/random_forest_model.joblib")
 
-# Feature order (VERY IMPORTANT)
+# Feature order 
 FEATURES = ['Time','V1','V2','V3','V4','V5','V6','V7','V8','V9',
             'V10','V11','V12','V13','V14','V15','V16','V17','V18',
             'V19','V20','V21','V22','V23','V24','V25','V26','V27',
@@ -21,7 +21,7 @@ if not os.path.exists("results.csv"):
     with open("results.csv", "w") as f:
         pass
 
-# Kafka consumer (with local file fallback)
+
 consumer = None
 
 try:
@@ -48,7 +48,7 @@ def handle_transaction(transaction):
         if "Class" in transaction:
             transaction.pop("Class")
 
-        # Convert to DataFrame
+       
         X = pd.DataFrame([transaction])
         X = X[FEATURES]
 

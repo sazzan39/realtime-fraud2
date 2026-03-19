@@ -36,6 +36,6 @@ while True:
         with open(QUEUE_FILE, "a", encoding="utf-8") as f:
             f.write(json.dumps(txn) + "\n")
 
-    print("sent")
+    print("Transaction sent")
 
-    time.sleep(0.05)   # ⚡ FAST (20/sec)
+    time.sleep(0.05)   
