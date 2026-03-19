@@ -2,18 +2,17 @@ import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
 
-# Load model (train in Colab)
+
 model = load_model("emotion_model.h5")
 
-# Emotion labels
+
 emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
-# Load face detector
 face_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xpip install pandas joblib kafka-python streamlit pyspark==3.5.1 scikit-learn==1.2.2ml"
 )
 
-# Start webcam
+
 cap = cv2.VideoCapture(0)
 
 print("🎥 Emotion Detection Started... Press Q to exit")
